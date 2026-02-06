@@ -1,0 +1,106 @@
+/* This is now a centered panel inside App, not a full-screen page */
+.alWrap{
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.alCard{
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  padding: 18px;
+}
+
+.alHead{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.alHead h2{
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.alHead p{
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.alForm{
+  display: grid;
+  gap: 12px;
+}
+
+.alForm label{
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.alForm input{
+  margin-top: 6px;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+}
+
+.alForm input:focus{
+  border-color: rgba(37,99,235,.6);
+  box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+}
+
+.alPassRow{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.alMini{
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.alPrimary{
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.alPrimary:hover{ background: #1d4ed8; }
+.alPrimary:disabled{ opacity: .6; cursor: not-allowed; }
+
+.alHint{
+  margin-top: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.alHint code{
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
