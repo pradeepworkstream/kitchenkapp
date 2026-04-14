@@ -77,7 +77,7 @@
 .primary:hover{ background: var(--primary2); }
 .primary:disabled{ opacity: .6; cursor: not-allowed; }
 
-/* WhatsApp button style (ghost) */
+/* Ghost buttons (PDF / Excel) */
 .primary.ghost{
   background: #fff;
   color: var(--text);
@@ -88,7 +88,116 @@
   border-color: rgba(37,99,235,.35);
 }
 
-/* ✅ chips bar */
+/* WhatsApp green button */
+.primary.waBtn{
+  background:#16a34a;
+  color:#fff;
+  border:none;
+}
+.primary.waBtn:hover{
+  background:#15803d;
+}
+
+/* =======================
+   ✅ Cart
+======================= */
+.cartBar{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px 0;
+  flex-shrink: 0;
+}
+
+.cartLeft{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.cartTitle{
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.cartCount{
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.cartRight{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* cart list */
+.cartWrap{
+  padding: 10px 18px 0;
+}
+
+.cartList{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.cartRow{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.cartRow:last-child{ border-bottom: none; }
+
+.cartMain{
+  min-width: 0;
+}
+
+.cartName{
+  color: var(--text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cartCat{
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cartMeta{
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cartRemove{
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #b91c1c;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.cartRemove:hover{
+  background: #fef2f2;
+  border-color: rgba(185,28,28,.25);
+}
+
+/* =======================
+   Chips bar
+======================= */
 .chipsBar{
   display: flex;
   justify-content: space-between;
@@ -155,7 +264,6 @@
   font-weight: 900;
 }
 
-/* To/CC switch */
 .seg{
   display: inline-flex;
   border: 1px solid var(--border);
@@ -178,7 +286,6 @@
   color: #fff;
 }
 
-/* Form */
 .formGrid{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -214,7 +321,7 @@ input:focus, textarea:focus, select:focus{
   box-shadow: 0 0 0 4px rgba(37,99,235,.12);
 }
 
-/* ✅ WhatsApp block */
+/* WhatsApp block */
 .waBlock{
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -250,7 +357,6 @@ input:focus, textarea:focus, select:focus{
 
 .waSpan2{ grid-column: span 2; }
 
-/* table section */
 .tableWrap{
   flex: 1;
   padding: 0 18px 18px;
@@ -277,7 +383,6 @@ input:focus, textarea:focus, select:focus{
   font-weight: 700;
 }
 
-/* TABLE */
 .table{
   width: 100%;
   border-collapse: separate;
@@ -338,7 +443,6 @@ input:focus, textarea:focus, select:focus{
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
-/* qty */
 .qtyWrap{
   display: flex;
   align-items: center;
@@ -384,14 +488,239 @@ input:focus, textarea:focus, select:focus{
 
   .topBtns{ flex-direction: column; align-items: stretch; width: 100%; }
   .primary{ width: 100%; }
+
+  .cartBar{ flex-direction: column; align-items: flex-start; }
+  .cartRight{ width: 100%; justify-content: flex-start; }
 }
 
-/* WhatsApp button style (green) */
-.primary.ghost{
-  background:#16a34a;
-  color:#fff;
-  border:none;
+/* Modal */
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 99999;
 }
-.primary.ghost:hover{
-  background:#15803d;
+
+.modalCard{
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.18);
+}
+
+.modalCard h3{
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.modalCard p{
+  margin: 8px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.modalBtns{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Cancel / secondary */
+.secondary{
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.secondary:hover{
+  background: #f8fafc;
+  border-color: rgba(37,99,235,.25);
+}
+.secondary:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* Cart top button */
+.cartBtn{
+  background: #0b1220;
+}
+.cartBtn:hover{
+  background: #111827;
+}
+
+/* Cart modal */
+.cartModal{
+  max-width: 720px;
+}
+
+.cartModalHeader{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.closeBtn{
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 900;
+}
+.closeBtn:hover{
+  background: #f8fafc;
+}
+
+.mutedText{
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Cart list inside modal */
+.cartList{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.cartRow{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.cartRow:last-child{ border-bottom: none; }
+
+.cartMain{ min-width: 0; }
+
+.cartName{
+  color: var(--text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cartCat{
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cartMeta{
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cartRemove{
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #b91c1c;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.cartRemove:hover{
+  background: #fef2f2;
+  border-color: rgba(185,28,28,.25);
+}
+
+.cartActions{
+  display:flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.addBtn{
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .15s;
+}
+.addBtn:hover{
+  background: #f8fafc;
+  border-color: rgba(37,99,235,.35);
+}
+.addBtn.added{
+  background: #ecfdf5;
+  border-color: rgba(22,163,74,.35);
+  color: #166534;
+  cursor: not-allowed;
+}
+.addBtn:disabled{
+  opacity: 1;
+}
+
+.cartBtn{
+  position: relative;
+  padding-right: 44px; /* space for badge */
+}
+
+.cartBadge{
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #ef4444; /* red */
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18);
+  border: 2px solid #fff;
+}
+
+.cartEdit{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:6px;
+}
+
+.cartEdit select{
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  font-size:12px;
+}
+
+.cartEdit .qtyInput{
+  width:70px;
 }

@@ -1,10 +1,12 @@
 // src/InventoryAdmin.jsx
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "./InventoryAdmin.css";
+import api from "../api/api.js";
+import productsService from "../api/productsService.js";
+import Pagination from "./Pagination.jsx";
 
-const API_URL = (import.meta.env.VITE_BACKEND_URL || "http://localhost:5001").replace(/\/+$/, "");
+
 
 const emptyForm = {
   category: "",
@@ -12,6 +14,7 @@ const emptyForm = {
   brandOptionsText: "", // comma separated
   unit: "",
   regPrice: "",
+  stock: "",
   sizeText: "",
   isActive: true,
 };
@@ -35,9 +38,15 @@ export default function InventoryAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // server-side pagination
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [limit, setLimit] = useState(20);
+
   // UI state
   const [query, setQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [stockFilter, setStockFilter] = useState("all");
 
   // Create/Edit
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -48,35 +57,44 @@ export default function InventoryAdmin() {
   // Delete
   const [deletingId, setDeletingId] = useState(null);
 
-  const load = async () => {
+  const load = async ({ p = page, q = query, cat = categoryFilter, stock = stockFilter } = {}) => {
     setLoading(true);
     try {
-      // ✅ public route (no token needed)
-      const res = await axios.get(`${API_URL}/api/inventory/list`);
-      if (!res.data?.success) throw new Error(res.data?.message || "Failed to load inventory");
-      setItems(res.data.items || []);
+      const res = await productsService.list({ page: p, limit, search: q, category: cat, stock });
+      if (!res?.success) throw new Error(res?.message || "Failed to load products");
+      setItems(res.data || []);
+      setPage(res.page || p);
+      setPages(res.pages || 1);
     } catch (e) {
       console.error(e);
-      toast.error("Failed to load inventory.");
+      toast.error("Failed to load products.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    load({ p: page, q: query, cat: categoryFilter, stock: stockFilter });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, stockFilter]);
+
+  // debounce search and category
+  useEffect(() => {
+    const t = setTimeout(() => load({ p: 1, q: query, cat: categoryFilter, stock: stockFilter }), 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, categoryFilter, stockFilter]);
 
   const categories = useMemo(() => {
     const set = new Set();
     (items || []).forEach((it) => set.add(it.category || ""));
-    return ["ALL", ...Array.from(set).filter(Boolean).sort((a, b) => a.localeCompare(b))];
+    return ["", ...Array.from(set).filter(Boolean).sort((a, b) => a.localeCompare(b))];
   }, [items]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (items || [])
-      .filter((it) => (categoryFilter === "ALL" ? true : it.category === categoryFilter))
+      .filter((it) => (categoryFilter === "" ? true : it.category === categoryFilter))
       .filter((it) => {
         if (!q) return true;
         const hay = `${it.category || ""} ${it.name || ""} ${(it.brandOptions || []).join(" ")} ${it.unit || ""}`
@@ -105,6 +123,7 @@ export default function InventoryAdmin() {
       brandOptionsText: toBrandsText(it.brandOptions || []),
       unit: it.unit || "",
       regPrice: String(it.regPrice ?? ""),
+      stock: String(it.stock ?? ""),
       sizeText: it.sizeText || "",
       isActive: it.isActive ?? true,
       _id: it._id, // keep for update
@@ -134,6 +153,7 @@ export default function InventoryAdmin() {
       brandOptions: toBrandsArray(form.brandOptionsText),
       unit: String(form.unit || "").trim(),
       regPrice: form.regPrice === "" ? 0 : Number(form.regPrice),
+      stock: form.stock === "" ? 0 : Number(form.stock),
       sizeText: String(form.sizeText || "").trim(),
       isActive: !!form.isActive,
     };
@@ -144,28 +164,20 @@ export default function InventoryAdmin() {
     setSaving(true);
     try {
       if (mode === "create") {
-        // ✅ PROTECTED
-        const res = await axios.post(`${API_URL}/api/inventory`, payload, {
-          headers: authHeaders,
-        });
+        const res = await api.post("/api/products", payload, { headers: authHeaders });
         if (!res.data?.success) throw new Error(res.data?.message || "Create failed");
         toast.success("Item created");
       } else {
-        // ✅ PROTECTED
         const id = form._id;
-        const res = await axios.put(`${API_URL}/api/inventory/${id}`, payload, {
-          headers: authHeaders,
-        });
+        const res = await api.put(`/api/products/${id}`, payload, { headers: authHeaders });
         if (!res.data?.success) throw new Error(res.data?.message || "Update failed");
         toast.success("Item updated");
       }
-      await load();
+      await load({ p: 1 });
       setDrawerOpen(false);
       setForm(emptyForm);
     } catch (e) {
       console.error(e);
-
-      // ✅ nice message for auth errors
       const status = e?.response?.status;
       if (status === 401 || status === 403) {
         toast.error("Unauthorized. Please login again.");
@@ -187,16 +199,12 @@ export default function InventoryAdmin() {
 
     setDeletingId(it._id);
     try {
-      // ✅ PROTECTED
-      const res = await axios.delete(`${API_URL}/api/inventory/${it._id}`, {
-        headers: authHeaders,
-      });
+      const res = await api.delete(`/api/products/${it._id}`, { headers: authHeaders });
       if (!res.data?.success) throw new Error(res.data?.message || "Delete failed");
       toast.success("Item deleted");
-      await load();
+      await load({ p: 1 });
     } catch (e) {
       console.error(e);
-
       const status = e?.response?.status;
       if (status === 401 || status === 403) {
         toast.error("Unauthorized. Please login again.");
@@ -225,21 +233,29 @@ export default function InventoryAdmin() {
         <div className="invFilters">
           <div className="invField">
             <label>Search</label>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by category, product, brand, unit…"
-            />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name or category…" />
           </div>
 
           <div className="invField">
             <label>Category</label>
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+              <option value="">All Categories</option>
               {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c === "ALL" ? "All Categories" : c}
-                </option>
+                c && (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                )
               ))}
+            </select>
+          </div>
+
+          <div className="invField">
+            <label>Stock</label>
+            <select value={stockFilter} onChange={(e) => setStockFilter(e.target.value)}>
+              <option value="all">All</option>
+              <option value="low">Low (&le;5)</option>
+              <option value="out">Out of stock</option>
             </select>
           </div>
 
@@ -266,6 +282,7 @@ export default function InventoryAdmin() {
                     <th>Category</th>
                     <th>Product</th>
                     <th>Brand Options</th>
+                    <th>Stock</th>
                     <th>Unit</th>
                     <th>Status</th>
                     <th className="invActionsCol">Actions</th>
@@ -273,26 +290,27 @@ export default function InventoryAdmin() {
                 </thead>
 
                 <tbody>
-                  {filtered.map((it) => (
+                  {items.map((it) => (
                     <tr key={it._id}>
                       <td className="tdMuted">{it.category}</td>
                       <td className="tdStrong">{it.name}</td>
                       <td className="tdSmall">{(it.brandOptions || []).join(", ") || "-"}</td>
+                      <td>
+                        {typeof it.stock === "number" ? (
+                          <span className={`stockBadge ${it.stock <= 5 ? "low" : ""}`}>{it.stock}</span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="tdSmall">{it.unit || "-"}</td>
                       <td>
-                        <span className={`badge ${it.isActive ? "on" : "off"}`}>
-                          {it.isActive ? "Active" : "Inactive"}
-                        </span>
+                        <span className={`badge ${it.isActive ? "on" : "off"}`}>{it.isActive ? "Active" : "Inactive"}</span>
                       </td>
                       <td className="invActions">
                         <button className="btnGhost" onClick={() => openEdit(it)}>
                           Edit
                         </button>
-                        <button
-                          className="btnDanger"
-                          disabled={deletingId === it._id}
-                          onClick={() => onDelete(it)}
-                        >
+                        <button className="btnDanger" disabled={deletingId === it._id} onClick={() => onDelete(it)}>
                           {deletingId === it._id ? "Deleting…" : "Delete"}
                         </button>
                       </td>
@@ -303,6 +321,8 @@ export default function InventoryAdmin() {
             </div>
           )}
         </div>
+
+        <Pagination page={page} pages={pages} onChange={(p) => setPage(p)} />
       </div>
 
       {/* Drawer */}
@@ -377,6 +397,20 @@ export default function InventoryAdmin() {
                 placeholder='e.g., "10lb", "28oz"'
               />
             </div>
+          </div>
+
+          <div className="grid2">
+            <div className="invField">
+              <label>Stock</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={form.stock}
+                onChange={(e) => setForm((p) => ({ ...p, stock: e.target.value }))}
+                placeholder="0"
+              />
+            </div>
+            <div />
           </div>
 
           <div className="toggleRow">

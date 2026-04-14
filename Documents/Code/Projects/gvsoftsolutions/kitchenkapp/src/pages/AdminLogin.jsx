@@ -1,9 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "./AdminLogin.css";
-
-const API_URL = (import.meta.env.VITE_BACKEND_URL || "http://localhost:5001").replace(/\/+$/, "");
+import api from "../api/api.js";
 
 export default function AdminLogin({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
@@ -18,7 +16,7 @@ export default function AdminLogin({ onLoginSuccess }) {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, {
+      const res = await api.post("/api/auth/login", {
         email: email.trim(),
         password,
       });

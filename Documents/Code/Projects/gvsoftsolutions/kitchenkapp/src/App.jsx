@@ -1,77 +1,73 @@
 // src/App.jsx
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import EmailForm from "./EmailForm.jsx";
-import InventoryAdmin from "./InventoryAdmin.jsx";
-import AdminLogin from "./AdminLogin.jsx";
+import InventoryAdmin from "./components/InventoryAdmin.jsx";
+import AdminLogin from "./pages/AdminLogin.jsx";
+import Dashboard from "./components/Dashboard.jsx";
+import Orders from "./pages/Orders.jsx";
+import Users from "./pages/Users.jsx";
+import Reports from "./pages/Reports.jsx";
+import Layout from "./components/Layout.jsx";
+import Products from "./pages/Products.jsx";
 import "./App.css";
 
 export default function App() {
-  const [active, setActive] = useState("email"); // "email" | "admin"
+  const [active, setActive] = useState("dashboard");
+  const [token, setToken] = useState(localStorage.getItem("admin_token") || "");
 
-  const token = useMemo(() => localStorage.getItem("admin_token"), []);
+  // keep token in sync (if someone clears localStorage)
+  useEffect(() => {
+    const onStorage = () => setToken(localStorage.getItem("admin_token") || "");
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const onLoginSuccess = () => {
-    // after login go to admin tab
-    setActive("admin");
+    const t = localStorage.getItem("admin_token") || "";
+    setToken(t);
+    setActive("dashboard");
   };
 
   const logout = () => {
     localStorage.removeItem("admin_token");
-    window.location.reload();
+    setToken("");
+    setActive("dashboard");
   };
 
+  // ✅ FULL APP LOCK: if not logged in → only login page
+  if (!token) {
+    return (
+      <>
+        <ToastContainer position="top-right" autoClose={3000} />
+        <div className="authWrap">
+          <AdminLogin onLoginSuccess={onLoginSuccess} />
+        </div>
+      </>
+    );
+  }
+
+  // App-level navigation values: dashboard, products, orders, users, reports, email
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <div className="appShell">
-        <div className="topNav">
-          <div className="brand">KitchenK Admin</div>
-
-          <div className="tabs">
-            <button
-              className={`tabBtn ${active === "email" ? "active" : ""}`}
-              onClick={() => setActive("email")}
-              type="button"
-            >
-              Email
-            </button>
-
-            <button
-              className={`tabBtn ${active === "admin" ? "active" : ""}`}
-              onClick={() => setActive("admin")}
-              type="button"
-            >
-              Admin
-            </button>
-          </div>
-
-          <div className="right">
-            {localStorage.getItem("admin_token") ? (
-              <button className="logoutBtn" type="button" onClick={logout}>
-                Logout
-              </button>
-            ) : (
-              <span className="hintSmall">Not logged in</span>
-            )}
-          </div>
-        </div>
-
-        <div className="appContent">
-          {active === "email" ? (
-            <EmailForm />
-          ) : !localStorage.getItem("admin_token") ? (
-            <div className="authWrap">
-              <AdminLogin onLoginSuccess={onLoginSuccess} />
-            </div>
-          ) : (
-            <InventoryAdmin />
-          )}
-        </div>
-      </div>
+      {
+        // render a single active page so Layout can forward props to it
+      }
+      <Layout active={active} setActive={setActive} onLogout={logout}>
+        {
+          (function () {
+            if (active === "dashboard") return <Dashboard />;
+            if (active === "products") return <Products />;
+            if (active === "orders") return <Orders />;
+            if (active === "users") return <Users />;
+            if (active === "reports") return <Reports />;
+            return <Dashboard />;
+          })()
+        }
+      </Layout>
     </>
   );
 }
