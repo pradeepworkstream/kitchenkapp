@@ -1,0 +1,422 @@
+/* src/components/InventoryAdmin.css */
+:root {
+  --bg:       #f5f7fb;
+  --card:     #ffffff;
+  --border:   #e5e7eb;
+  --text:     #0f172a;
+  --muted:    #64748b;
+  --primary:  #2563eb;
+  --primary2: #1d4ed8;
+  --rowHover: #f8fafc;
+  --danger:   #ef4444;
+}
+
+* { box-sizing: border-box; }
+
+/* ─── Page / Card ────────────────────────────────────────────────────────────── */
+.invPage {
+  background: var(--bg);
+  padding: 18px;
+  min-height: calc(100vh - 60px);
+}
+
+.invCard {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────────── */
+.invTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 18px 10px;
+}
+
+.invTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.invSub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────────── */
+.invPrimary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.invPrimary:hover    { background: var(--primary2); }
+.invPrimary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btnGhost {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  transition: background 0.12s;
+}
+.btnGhost:hover { background: #f8fafc; }
+
+.btnDanger {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: #fff;
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--danger);
+  transition: background 0.12s;
+}
+.btnDanger:hover    { background: #fff5f5; }
+.btnDanger:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ─── Filters ────────────────────────────────────────────────────────────────── */
+.invFilters {
+  display: flex;
+  gap: 12px;
+  padding: 8px 18px 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.invField {
+  min-width: 200px;
+  flex: 1;
+}
+
+.invField label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.invField input,
+.invField select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.invField input:focus,
+.invField select:focus {
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.invStats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-bottom: 2px;
+}
+
+.statPill {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  color: #334155;
+  white-space: nowrap;
+}
+
+/* ─── Table ──────────────────────────────────────────────────────────────────── */
+.invTableWrap {
+  padding: 0 18px 4px;
+}
+
+.invStatus {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.invTableViewport {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: auto;
+  background: #fff;
+  max-height: calc(100vh - 320px);
+}
+
+.invTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.invTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #0b1220;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid #111827;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.invTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  background: #fff;
+  vertical-align: middle;
+}
+
+.invTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.invTable tbody tr:hover td { background: var(--rowHover); }
+
+.tdMuted  { color: var(--muted); font-size: 12px; }
+.tdSmall  { color: #334155; font-size: 12px; }
+.tdStrong { font-weight: 800; color: var(--text); }
+
+.invActionsCol { width: 170px; }
+
+.invActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ─── Stock badge ────────────────────────────────────────────────────────────── */
+/* Used inline in InventoryAdmin.jsx via style prop — kept here for reference */
+.stockBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.stockBadge.low {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* ─── Status badge ───────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid var(--border);
+}
+
+.badge.on  { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+.badge.off { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
+/* ─── Drawer ─────────────────────────────────────────────────────────────────── */
+.drawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 9998;
+}
+
+.drawerOverlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -520px;
+  width: 520px;
+  max-width: calc(100vw - 18px);
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid var(--border);
+  box-shadow: -18px 0 44px rgba(15, 23, 42, 0.15);
+  transition: right 0.2s ease;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer.open { right: 0; }
+
+.drawerHeader {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.drawerHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.drawerSub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.drawerClose {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+
+.drawerClose:hover    { background: #f8fafc; }
+.drawerClose:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.drawerBody {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.drawerFooter {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ─── Drawer form grid ───────────────────────────────────────────────────────── */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.invField label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.invField input,
+.invField select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.invField input:focus,
+.invField select:focus {
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.toggleRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.toggleLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+}
+
+/* ─── Pagination (secondary buttons) ────────────────────────────────────────── */
+.secondary {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.secondary:hover    { background: #f8fafc; border-color: rgba(37, 99, 235, 0.25); }
+.secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .grid2     { grid-template-columns: 1fr; }
+  .invActions { justify-content: flex-start; }
+  .invField  { min-width: 100%; }
+  .invFilters { flex-direction: column; }
+
+  .invTableViewport {
+    max-height: calc(100vh - 280px);
+  }
+}

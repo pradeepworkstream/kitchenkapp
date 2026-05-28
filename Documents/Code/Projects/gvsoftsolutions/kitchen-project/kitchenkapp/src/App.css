@@ -1,0 +1,55 @@
+/* src/App.css */
+.authWrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: #f3f4f6;
+}
+
+/* User (non-admin) shell */
+.user-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-topbar {
+  height: 60px;
+  background: #0b1220;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.user-brand {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.user-role-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+}
+
+.user-logout {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s;
+}
+.user-logout:hover { background: rgba(255,255,255,.2); }

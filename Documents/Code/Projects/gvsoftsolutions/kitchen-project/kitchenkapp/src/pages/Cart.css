@@ -1,0 +1,171 @@
+.invPage {
+  padding: 20px;
+}
+
+.invCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06);
+}
+
+.invStatus {
+  padding: 40px 0;
+  text-align: center;
+  color: #4b5563;
+}
+
+.cartItems {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cartItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.cartItemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cartItemInfo strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.cartItemInfo small {
+  color: #6b7280;
+}
+
+.cartItemControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cartItemControls label {
+  color: #374151;
+  font-size: 14px;
+}
+
+.cartItemControls input {
+  width: 72px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #111827;
+}
+
+.btnSmall,
+.btnPrimary,
+.btnSecondary {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btnSmall {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.btnSmall:hover {
+  background: #f9fafb;
+}
+
+.btnPrimary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  background: #1d4ed8;
+}
+
+.btnSecondary {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.btnSecondary:hover {
+  background: #f9fafb;
+}
+
+.cartActions {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Contact Forms */
+.sendOptions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.contactForm {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.contactForm h5 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.invField {
+  margin-bottom: 16px;
+}
+
+.invField label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.invField input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.invField input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}

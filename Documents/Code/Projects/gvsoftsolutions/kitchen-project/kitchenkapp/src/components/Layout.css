@@ -1,0 +1,219 @@
+/* src/components/Layout.css */
+.kk-layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+}
+
+.kk-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #0f1724;
+  color: #fff;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+  overflow: hidden;
+}
+
+.kk-sidebar.collapsed { width: 64px; }
+
+.kk-brand {
+  font-weight: 800;
+  font-size: 18px;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kk-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.kk-nav-item {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background 0.12s, color 0.12s;
+}
+
+.kk-nav-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.kk-nav-item.active {
+  background: rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+
+.kk-nav-icon { font-size: 16px; flex-shrink: 0; }
+.kk-nav-label { overflow: hidden; }
+
+.kk-sidebar-footer {
+  margin-top: auto;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 6px;
+}
+
+.kk-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f6f8fa;
+  min-width: 0;
+}
+
+.kk-topbar {
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #e6e9ee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.kk-left { display: flex; align-items: center; gap: 12px; }
+
+.kk-hamburger {
+  font-size: 20px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #374151;
+  line-height: 1;
+}
+.kk-hamburger:hover { background: #f3f4f6; }
+
+.kk-right { display: flex; align-items: center; gap: 12px; }
+
+.kk-icon {
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+}
+.kk-icon:hover { background: #f3f4f6; }
+
+.kk-content { flex: 1; overflow: auto; }
+
+/* Profile dropdown */
+.kk-profile-root { position: relative; }
+
+.kk-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.kk-profile-btn:hover { background: rgba(0, 0, 0, 0.04); }
+
+.kk-avatar {
+  background: #0f1724;
+  color: #fff;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.kk-username { font-size: 14px; color: #0f1724; font-weight: 600; }
+
+.kk-caret { font-size: 11px; color: #6b7280; transition: transform 0.12s; }
+.kk-caret.open { transform: rotate(180deg); }
+
+.kk-profile-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 150px;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 36, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 23, 36, 0.10);
+  border-radius: 10px;
+  padding: 6px;
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  transform-origin: top right;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  z-index: 9999;
+}
+
+.kk-profile-menu.show {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.kk-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111;
+  font-weight: 500;
+}
+.kk-menu-item:hover { background: rgba(15, 23, 36, 0.05); }
+.kk-menu-logout { color: #b91c1c; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .kk-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+    transform: translateX(-100%);
+    width: 220px !important;
+  }
+
+  .kk-layout.sidebar-collapsed .kk-sidebar {
+    transform: translateX(0);
+  }
+
+  .kk-username { display: none; }
+}

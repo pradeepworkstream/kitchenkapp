@@ -1,0 +1,83 @@
+.waCard{
+  margin-top: 18px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  box-shadow:0 12px 28px rgba(15,23,42,.06);
+  padding:16px;
+}
+
+.waHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.waHead h3{
+  margin:0;
+  font-size:18px;
+  color:#0f172a;
+}
+
+.waHead p{
+  margin:6px 0 0;
+  font-size:13px;
+  color:#64748b;
+}
+
+.waBtn{
+  background:#16a34a;
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.waBtn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.waGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+
+.span2{ grid-column: span 2; }
+
+.waGrid label{
+  font-size:12px;
+  font-weight:800;
+  color:#334155;
+  display:block;
+}
+
+.waGrid input, .waGrid textarea{
+  margin-top:6px;
+  width:100%;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:13px;
+  outline:none;
+  background:#fff;
+}
+
+.waGrid textarea{
+  resize: vertical;
+}
+
+.waGrid input:focus, .waGrid textarea:focus{
+  border-color: rgba(22,163,74,.6);
+  box-shadow:0 0 0 4px rgba(22,163,74,.12);
+}
+
+@media (max-width: 820px){
+  .waGrid{ grid-template-columns:1fr; }
+  .span2{ grid-column:auto; }
+}
