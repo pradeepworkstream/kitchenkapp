@@ -4,14 +4,15 @@ import { toast } from "react-toastify";
 import "./InventoryAdmin.css";
 import api from "../api/api.js";
 import Pagination from "./Pagination.jsx";
+import { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES } from "../data/vendorCategories.js";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = {
+  vendor:          "",
   category:        "",
   name:            "",
   brandOptionsText: "",
-  unit:            "",
   regPrice:        "",
   stock:           "",
   sizeText:        "",
@@ -19,9 +20,6 @@ const EMPTY_FORM = {
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const toBrandsArray = (text) =>
-  String(text || "").split(",").map((x) => x.trim()).filter(Boolean);
 
 const toBrandsText = (arr) =>
   Array.isArray(arr) ? arr.join(", ") : "";
@@ -39,24 +37,25 @@ export default function InventoryAdmin() {
 
   // Filters
   const [query,         setQuery]         = useState("");
+  const [vendorFilter,  setVendorFilter]  = useState("");
   const [categoryFilter,setCategoryFilter] = useState("");
-  const [stockFilter,   setStockFilter]   = useState("all");
 
   // Create / Edit drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mode,       setMode]       = useState("create");
   const [form,       setForm]       = useState(EMPTY_FORM);
   const [saving,     setSaving]     = useState(false);
+  const [addingCategory, setAddingCategory] = useState(false);
 
   // Delete
   const [deletingId, setDeletingId] = useState(null);
 
   // ── Load from correct backend endpoint ──────────────────────────────────
-  const load = useCallback(async ({ p = page, q = query, cat = categoryFilter, stock = stockFilter } = {}) => {
+  const load = async ({ p = page, q = query, cat = categoryFilter, vendor = vendorFilter } = {}) => {
     setLoading(true);
     try {
       const res = await api.get("/api/inventory/list", {
-        params: { page: p, limit: LIMIT, search: q, category: cat, stock },
+        params: { page: p, limit: LIMIT, search: q, category: cat, vendor },
       });
       if (!res.data?.success) throw new Error(res.data?.message || "Failed");
       setItems(res.data.data || []);
@@ -67,43 +66,53 @@ export default function InventoryAdmin() {
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  };
 
-  // Reload on page / stockFilter change
+  // Reload on page or vendor change
   useEffect(() => {
-    load({ p: page, stock: stockFilter });
-  }, [page, stockFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+    load({ p: page, q: query, cat: categoryFilter, vendor: vendorFilter });
+  }, [page, vendorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Debounce search + category
+  // Debounce search + category + vendor
   useEffect(() => {
     const t = setTimeout(() => {
-      load({ p: 1, q: query, cat: categoryFilter });
+      load({ p: 1, q: query, cat: categoryFilter, vendor: vendorFilter });
     }, 350);
     return () => clearTimeout(t);
-  }, [query, categoryFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [query, categoryFilter, vendorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Client-side filter (for the category dropdown options only) ──────────
+  // ── Client-side lists for vendors and categories (category options depend on vendor) ──────────
+  // no remote category cache; categories are vendor-scoped via VENDOR_CATEGORIES
+
+  // Vendor dropdown must show exactly these options
+  const vendors = VENDORS;
+
   const categories = useMemo(() => {
-    const set = new Set(items.map((it) => it.category).filter(Boolean));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [items]);
+    // when a vendor filter is selected, only show categories for that vendor
+    if (vendorFilter) return VENDOR_CATEGORIES[vendorFilter] || [];
+    // otherwise present combined list
+    return ALL_CATEGORIES;
+  }, [vendorFilter]);
+
 
   // ── Drawer helpers ───────────────────────────────────────────────────────
-  const openCreate = () => { setMode("create"); setForm(EMPTY_FORM); setDrawerOpen(true); };
+  const openCreate = () => { setMode("create"); setForm(EMPTY_FORM); setAddingCategory(false); setDrawerOpen(true); };
 
   const openEdit = (it) => {
     setMode("edit");
     setForm({
+      vendor:           it.vendor       || "",
       category:         it.category     || "",
       name:             it.name         || "",
       brandOptionsText: toBrandsText(it.brandOptions || []),
-      unit:             it.unit         || "",
+      // unit intentionally omitted per product schema simplification
       regPrice:         String(it.regPrice ?? ""),
       stock:            String(it.stock  ?? ""),
       sizeText:         it.sizeText     || "",
       isActive:         it.isActive     ?? true,
       _id:              it._id,
     });
+    setAddingCategory(!it.category || !categories.includes(it.category));
     setDrawerOpen(true);
   };
 
@@ -117,18 +126,16 @@ export default function InventoryAdmin() {
 
   // ── Save ─────────────────────────────────────────────────────────────────
   const onSave = async () => {
+    if (!String(form.vendor || "").trim()) return toast.error("Vendor is required");
     if (!String(form.category || "").trim()) return toast.error("Category is required");
     if (!String(form.name     || "").trim()) return toast.error("Name is required");
 
+    // Save minimal required fields as requested
     const payload = {
-      category:     String(form.category).trim(),
-      name:         String(form.name).trim(),
-      brandOptions: toBrandsArray(form.brandOptionsText),
-      unit:         String(form.unit     || "").trim(),
-      regPrice:     form.regPrice === "" ? 0 : Number(form.regPrice),
-      stock:        form.stock    === "" ? 0 : Number(form.stock),
-      sizeText:     String(form.sizeText || "").trim(),
-      isActive:     !!form.isActive,
+      vendor:   String(form.vendor || "").trim(),
+      category: String(form.category).trim(),
+      name:     String(form.name).trim(),
+      stock:    form.stock === "" ? 0 : Number(form.stock),
     };
 
     setSaving(true);
@@ -138,10 +145,13 @@ export default function InventoryAdmin() {
         const res = await api.post("/api/inventory", payload);
         if (!res.data?.success) throw new Error(res.data?.message || "Create failed");
         toast.success("Item created");
+        // notify other views (Shop) to refresh
+        try { window.dispatchEvent(new CustomEvent("inventory:changed", { detail: { action: "create", id: res.data.item?._id } })); } catch { /* ignore */ }
       } else {
         const res = await api.put(`/api/inventory/${form._id}`, payload);
         if (!res.data?.success) throw new Error(res.data?.message || "Update failed");
         toast.success("Item updated");
+        try { window.dispatchEvent(new CustomEvent("inventory:changed", { detail: { action: "update", id: res.data.item?._id } })); } catch { /* ignore */ }
       }
       await load({ p: 1 });
       setDrawerOpen(false);
@@ -165,6 +175,7 @@ export default function InventoryAdmin() {
       const res = await api.delete(`/api/inventory/${it._id}`);
       if (!res.data?.success) throw new Error(res.data?.message || "Delete failed");
       toast.success("Item deleted");
+      try { window.dispatchEvent(new CustomEvent("inventory:changed", { detail: { action: "delete", id: it._id } })); } catch { /* ignore */ }
       await load({ p: 1 });
     } catch (e) {
       const status = e?.response?.status;
@@ -200,21 +211,22 @@ export default function InventoryAdmin() {
           </div>
 
           <div className="invField">
-            <label>Category</label>
-            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-              <option value="">All Categories</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
+            <label>Vendor</label>
+            <select value={vendorFilter} onChange={(e) => { setVendorFilter(e.target.value); setCategoryFilter(""); setPage(1); }}>
+              <option value="">All Vendors</option>
+              {vendors.map((v) => (
+                <option key={v} value={v}>{v}</option>
               ))}
             </select>
           </div>
 
           <div className="invField">
-            <label>Stock</label>
-            <select value={stockFilter} onChange={(e) => { setStockFilter(e.target.value); setPage(1); }}>
-              <option value="all">All</option>
-              <option value="low">Low (≤5)</option>
-              <option value="out">Out of stock</option>
+            <label>Category</label>
+            <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}>
+              <option value="">All Categories</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
           </div>
 
@@ -236,10 +248,8 @@ export default function InventoryAdmin() {
                   <tr>
                     <th>Category</th>
                     <th>Product</th>
-                    <th>Brand Options</th>
                     <th>Stock</th>
-                    <th>Unit</th>
-                    <th>Status</th>
+                    {/* Unit column removed */}
                     <th className="invActionsCol">Actions</th>
                   </tr>
                 </thead>
@@ -248,7 +258,6 @@ export default function InventoryAdmin() {
                     <tr key={it._id}>
                       <td className="tdMuted">{it.category}</td>
                       <td className="tdStrong">{it.name}</td>
-                      <td className="tdSmall">{(it.brandOptions || []).join(", ") || "—"}</td>
                       <td>
                         {typeof it.stock === "number" ? (
                           <span style={{ color: it.stock <= 5 ? "#dc2626" : undefined, fontWeight: it.stock <= 5 ? 800 : undefined }}>
@@ -256,12 +265,7 @@ export default function InventoryAdmin() {
                           </span>
                         ) : "—"}
                       </td>
-                      <td className="tdSmall">{it.unit || "—"}</td>
-                      <td>
-                        <span className={`badge ${it.isActive ? "on" : "off"}`}>
-                          {it.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
+                      {/* unit hidden by request */}
                       <td>
                         <div className="invActions">
                           <button className="btnGhost" onClick={() => openEdit(it)}>Edit</button>
@@ -301,13 +305,51 @@ export default function InventoryAdmin() {
         <div className="drawerBody">
           <div className="grid2">
             <div className="invField">
-              <label>Category *</label>
-              <input value={form.category} onChange={setField("category")} placeholder="e.g., Rice" />
+              <label>Vendor *</label>
+              <select
+                value={form.vendor || ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setForm((prev) => ({ ...prev, vendor: v }));
+                  // reset category when vendor changes
+                  setAddingCategory(false);
+                  setForm((prev) => ({ ...prev, category: "" }));
+                }}
+              >
+                <option value="">Select vendor</option>
+                {vendors.map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
             </div>
+
             <div className="invField">
-              <label>Unit</label>
-              <input value={form.unit} onChange={setField("unit")} placeholder="e.g., LB / Bags / Packs" />
+              <label>Category *</label>
+              {!addingCategory ? (
+                <select
+                  value={form.category ? (categories.includes(form.category) ? form.category : "__add__") : ""}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "__add__") {
+                      setAddingCategory(true);
+                      setForm((prev) => ({ ...prev, category: "" }));
+                    } else {
+                      setForm((prev) => ({ ...prev, category: v }));
+                    }
+                  }}
+                  disabled={!form.vendor}
+                >
+                  <option value="">Select category</option>
+                  {(form.vendor ? (VENDOR_CATEGORIES[form.vendor] || []) : []).map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                  <option value="__add__">+ Add new category...</option>
+                </select>
+              ) : (
+                <input value={form.category} onChange={setField("category")} placeholder="e.g., Rice (type new)" />
+              )}
             </div>
+
           </div>
 
           <div className="invField">

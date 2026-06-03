@@ -69,6 +69,7 @@
   line-height: 1;
 }
 
+.shop-vendor-select,
 .shop-cat-select {
   border: 1px solid #e5e7eb;
   border-radius: 10px;

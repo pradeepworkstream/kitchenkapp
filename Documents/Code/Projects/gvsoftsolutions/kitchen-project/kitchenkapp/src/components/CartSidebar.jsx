@@ -42,8 +42,8 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
         </div>
         <div className="cs-empty">
           <div className="cs-empty-icon">🛒</div>
-          <p>Your cart is empty.</p>
-          <p className="cs-empty-sub">Click "Add to Cart" on any product.</p>
+          <p>Your vendor order is empty.</p>
+          <p className="cs-empty-sub">Click "Order from vendor" on any product.</p>
         </div>
       </div>
     );
@@ -71,9 +71,12 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
             <div className="cs-item-body">
               <div className="cs-item-name">{item.name}</div>
               <div className="cs-item-cat">{item.category}</div>
+              {item.vendorOrder && (
+                <div className="cs-item-badge">Vendor order</div>
+              )}
 
               {/* Qty controls — available to everyone */}
-              <div className="cs-item-controls">
+                <div className="cs-item-controls">
                 <div className="cs-qty">
                   <button
                     className="cs-qty-btn"
@@ -87,8 +90,6 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
                     aria-label="Increase"
                   >+</button>
                 </div>
-
-                <span className="cs-unit">{item.unit}</span>
 
                 {/* Edit button — admin only */}
                 {isAdmin && (
@@ -146,7 +147,7 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
           <span>Items</span><span>{cart.length}</span>
         </div>
         <div className="cs-summary-row">
-          <span>Total qty</span><span>{totalQty} units</span>
+          <span>Total qty</span><span>{totalQty}</span>
         </div>
         <div className="cs-summary-total">
           <span>Ready to order</span>

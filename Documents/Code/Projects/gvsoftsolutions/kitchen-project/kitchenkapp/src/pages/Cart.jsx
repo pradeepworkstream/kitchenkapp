@@ -12,6 +12,24 @@ export default function Cart({ reorderCart = [], setReorderCart, onNavigate }) {
     emailSubject: 'KitchenK Reorder Request',
     emailFrom: 'KitchenK Admin <admin@kitchenk.com>'
   });
+  const [vendorEmailSuggestions, setVendorEmailSuggestions] = useState([]);
+
+  // Fetch vendor names from inventory and build simple email suggestions
+  React.useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const res = await api.get('/api/inventory/list', { params: { limit: 200 } });
+        if (!res.data?.success) return;
+        const vendors = Array.from(new Set((res.data.data || []).map((i) => i.vendor).filter(Boolean)));
+        const emails = vendors.map((v) => `${v.toLowerCase().replace(/\s+/g, '')}@vendor.com`);
+        setVendorEmailSuggestions(emails);
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchVendors();
+  }, []);
 
   const removeFromReorderCart = (id) => {
     setReorderCart((prev) => prev.filter((i) => i._id !== id));
@@ -35,7 +53,7 @@ export default function Cart({ reorderCart = [], setReorderCart, onNavigate }) {
     setSendingReorder(true);
     try {
       const message = `Reorder Request:\n${reorderCart
-        .map((item) => `- ${item.name} (${item.category}): ${item.reorderQty} ${item.unit || "units"}`)
+        .map((item) => `- ${item.name} (${item.category}): ${item.reorderQty}`)
         .join("\n")}\n\nPlease deliver as soon as possible.`;
 
       console.log('Sending reorder:', { method, message, contactDetails });
@@ -94,7 +112,7 @@ export default function Cart({ reorderCart = [], setReorderCart, onNavigate }) {
                   <div className="cartItemInfo">
                     <strong>{item.name}</strong> ({item.category})
                     <br />
-                    <small>Unit: {item.unit || "N/A"}</small>
+                    {/* unit removed */}
                   </div>
                   <div className="cartItemControls">
                     <label>Qty:</label>
@@ -193,11 +211,18 @@ export default function Cart({ reorderCart = [], setReorderCart, onNavigate }) {
                 <div className="invField">
                   <label>To *</label>
                   <input
+                    list="emailSuggestions"
                     type="email"
                     value={contactForm.emailTo}
                     onChange={(e) => setContactForm(prev => ({ ...prev, emailTo: e.target.value }))}
                     placeholder="vendor@example.com"
                   />
+                  <datalist id="emailSuggestions">
+                    {vendorEmailSuggestions.map((em) => (
+                      <option key={em} value={em} />
+                    ))}
+                    <option value="vendor@example.com" />
+                  </datalist>
                 </div>
                 <div className="invField">
                   <label>Subject *</label>

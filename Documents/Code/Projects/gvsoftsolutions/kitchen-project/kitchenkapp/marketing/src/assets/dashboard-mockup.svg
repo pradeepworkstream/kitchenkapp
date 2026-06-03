@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520">
+  <rect rx="12" width="800" height="520" fill="#0f1724" />
+  <g fill="#fff" opacity="0.06">
+    <rect x="40" y="40" width="200" height="120" rx="8" />
+    <rect x="260" y="40" width="420" height="120" rx="8" />
+    <rect x="40" y="180" width="640" height="260" rx="8" />
+  </g>
+  <text x="60" y="115" fill="#8aa2ff" font-size="20" font-family="Inter, Arial">KitchenK Dashboard</text>
+</svg>

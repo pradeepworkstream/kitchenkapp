@@ -4,9 +4,9 @@ import api from "./api.js";
  * List inventory items from the main KitchenK backend (/api/inventory/list)
  * Falls back to /api/products if the inventory endpoint is unavailable.
  */
-const list = async ({ page = 1, limit = 20, search = "", category = "", stock = "all" } = {}) => {
+const list = async ({ page = 1, limit = 20, search = "", category = "", vendor = "", stock = "all" } = {}) => {
   const res = await api.get("/api/inventory/list", {
-    params: { page, limit, search, category, stock },
+    params: { page, limit, search, category, vendor, stock },
   });
   return res.data;
 };
