@@ -1,17 +1,18 @@
+// src/pages/Users.jsx
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../api/api.js";
+import "./Users.css";
+
+const EMPTY_FORM = { fullName: "", email: "", password: "", role: "user" };
 
 export default function Users() {
-  const [users, setUsers] = useState([]);
+  const [users,   setUsers]   = useState([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    role: "user",
-  });
+  const [saving,  setSaving]  = useState(false);
+  const [form,    setForm]    = useState(EMPTY_FORM);
+
+  const setField = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -23,36 +24,29 @@ export default function Users() {
         throw new Error(res.data?.message || "Unable to load users");
       }
     } catch (err) {
-      console.error(err);
       toast.error(err?.response?.data?.message || err.message || "Failed to load users");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const onCreateUser = async () => {
-    if (!form.email || !form.password) {
-      return toast.error("Email and password are required");
-    }
-
+    if (!form.email || !form.password) return toast.error("Email and password are required");
     setSaving(true);
     try {
       const res = await api.post("/api/auth/register", {
-        email: form.email,
+        email:    form.email,
         password: form.password,
         fullName: form.fullName,
-        role: form.role,
+        role:     form.role,
       });
       if (!res.data?.success) throw new Error(res.data?.message || "Create failed");
       toast.success("User created successfully");
-      setForm({ fullName: "", email: "", password: "", role: "user" });
+      setForm(EMPTY_FORM);
       await fetchUsers();
     } catch (err) {
-      console.error(err);
       toast.error(err?.response?.data?.message || err.message || "Failed to create user");
     } finally {
       setSaving(false);
@@ -60,141 +54,138 @@ export default function Users() {
   };
 
   const onDeleteUser = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
+    if (!window.confirm("Delete this user? This cannot be undone.")) return;
     try {
       const res = await api.delete(`/api/auth/users/${id}`);
       if (!res.data?.success) throw new Error(res.data?.message || "Delete failed");
       toast.success("User deleted");
       await fetchUsers();
     } catch (err) {
-      console.error(err);
       toast.error(err?.response?.data?.message || err.message || "Failed to delete user");
     }
   };
 
   return (
-    <div style={{ padding: "24px 26px", maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: 0 }}>Users</h2>
-        <p style={{ margin: "8px 0 0", color: "#6b7280" }}>
-          Create and manage application users and admin accounts.
-        </p>
-      </div>
+    <div className="usr-page">
+      <div className="usr-inner">
 
-      <div style={{ display: "grid", gap: 16, marginBottom: 28, gridTemplateColumns: "1fr 1fr 1fr" }}>
-        <div>
-          <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Full Name</label>
-          <input
-            value={form.fullName}
-            onChange={(e) => setForm((prev) => ({ ...prev, fullName: e.target.value }))}
-            placeholder="Optional full name"
-            style={{ width: "100%", padding: 12, borderRadius: 12, border: "1px solid #d1d5db" }}
-          />
+        {/* Header */}
+        <div className="usr-head">
+          <h1 className="usr-title">Users</h1>
+          <p className="usr-sub">Create and manage application users and admin accounts.</p>
         </div>
-        <div>
-          <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Email</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-            placeholder="user@example.com"
-            style={{ width: "100%", padding: 12, borderRadius: 12, border: "1px solid #d1d5db" }}
-          />
-        </div>
-        <div>
-          <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Password</label>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-            placeholder="Enter a secure password"
-            style={{ width: "100%", padding: 12, borderRadius: 12, border: "1px solid #d1d5db" }}
-          />
-        </div>
-      </div>
 
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 32 }}>
-        <div style={{ minWidth: 220 }}>
-          <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Role</label>
-          <select
-            value={form.role}
-            onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
-            style={{ width: "100%", padding: 12, borderRadius: 12, border: "1px solid #d1d5db" }}
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
+        {/* Create user form */}
+        <div className="usr-create-card">
+          <h2 className="usr-card-title">Create New User</h2>
+          <div className="usr-form-grid">
+            <div className="usr-field">
+              <label className="usr-label">Full Name <span style={{ color: "#94a3b8", fontWeight: 400, textTransform: "none" }}>(optional)</span></label>
+              <input
+                className="usr-input"
+                value={form.fullName}
+                onChange={setField("fullName")}
+                placeholder="Jane Doe"
+              />
+            </div>
+            <div className="usr-field">
+              <label className="usr-label">Email *</label>
+              <input
+                className="usr-input"
+                type="email"
+                value={form.email}
+                onChange={setField("email")}
+                placeholder="user@example.com"
+              />
+            </div>
+            <div className="usr-field">
+              <label className="usr-label">Password *</label>
+              <input
+                className="usr-input"
+                type="password"
+                value={form.password}
+                onChange={setField("password")}
+                placeholder="Minimum 8 characters"
+              />
+            </div>
+            <div className="usr-field">
+              <label className="usr-label">Role</label>
+              <select className="usr-select" value={form.role} onChange={setField("role")}>
+                <option value="user">User (Staff)</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+            <button
+              className="usr-btn-create"
+              style={{ width: "auto", minWidth: 160 }}
+              onClick={onCreateUser}
+              disabled={saving}
+            >
+              {saving ? "Creating…" : "+ Create User"}
+            </button>
+          </div>
         </div>
-        <button
-          onClick={onCreateUser}
-          disabled={saving}
-          style={{
-            background: "#2563eb",
-            color: "#fff",
-            border: "none",
-            borderRadius: 12,
-            padding: "12px 20px",
-            cursor: "pointer",
-            fontWeight: 700,
-          }}
-        >
-          {saving ? "Creating…" : "Create User"}
-        </button>
-      </div>
 
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 740 }}>
-          <thead>
-            <tr style={{ textAlign: "left", borderBottom: "2px solid #e5e7eb" }}>
-              <th style={{ padding: "12px 12px 10px" }}>Name</th>
-              <th style={{ padding: "12px 12px 10px" }}>Email</th>
-              <th style={{ padding: "12px 12px 10px" }}>Role</th>
-              <th style={{ padding: "12px 12px 10px" }}>Active</th>
-              <th style={{ padding: "12px 12px 10px" }}>Created</th>
-              <th style={{ padding: "12px 12px 10px" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} style={{ padding: 20, color: "#6b7280" }}>
-                  Loading users…
-                </td>
-              </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ padding: 20, color: "#6b7280" }}>
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              users.map((user) => (
-                <tr key={user._id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                  <td style={{ padding: "14px 12px" }}>{user.fullName || "—"}</td>
-                  <td style={{ padding: "14px 12px" }}>{user.email}</td>
-                  <td style={{ padding: "14px 12px" }}>{user.role}</td>
-                  <td style={{ padding: "14px 12px" }}>{user.isActive ? "Yes" : "No"}</td>
-                  <td style={{ padding: "14px 12px" }}>{new Date(user.createdAt).toLocaleString()}</td>
-                  <td style={{ padding: "14px 12px" }}>
-                    <button
-                      onClick={() => onDeleteUser(user._id)}
-                      style={{
-                        background: "#ef4444",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 10,
-                        padding: "8px 14px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
+        {/* Users table */}
+        <div className="usr-table-card">
+          <div className="usr-table-head">
+            <span className="usr-table-title">All Users</span>
+            <span className="usr-count">{users.length} user{users.length !== 1 ? "s" : ""}</span>
+          </div>
+
+          <div className="usr-table-wrap">
+            <table className="usr-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Active</th>
+                  <th>Created</th>
+                  <th>Actions</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={6} className="usr-td-loading">Loading users…</td></tr>
+                ) : users.length === 0 ? (
+                  <tr><td colSpan={6} className="usr-td-empty">No users found. Create one above.</td></tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user._id}>
+                      <td className="usr-td-name">{user.fullName || <span className="usr-dash">—</span>}</td>
+                      <td className="usr-td-email">{user.email}</td>
+                      <td>
+                        <span className={`usr-role ${user.role === "admin" ? "usr-role--admin" : "usr-role--user"}`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`usr-active ${user.isActive !== false ? "usr-active--yes" : "usr-active--no"}`}>
+                          {user.isActive !== false ? "✓ Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="usr-td-date">
+                        {user.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                          : <span className="usr-dash">—</span>
+                        }
+                      </td>
+                      <td>
+                        <button className="usr-btn-del" onClick={() => onDeleteUser(user._id)}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   );

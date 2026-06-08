@@ -1,34 +1,38 @@
 /* src/App.css */
-.authWrap {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  background: #f3f4f6;
-}
 
-/* User (non-admin) shell */
+/* ── Staff (non-admin) shell ─────────────────────────────────────────────── */
 .user-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 .user-topbar {
-  height: 60px;
-  background: #0b1220;
+  height: 58px;
+  background: #0f1724;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-brand {
   font-weight: 800;
   font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+.user-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .user-role-pill {
@@ -36,20 +40,20 @@
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.2);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .user-logout {
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #fff;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 7px 14px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background .12s;
+  transition: background 0.12s;
 }
-.user-logout:hover { background: rgba(255,255,255,.2); }
+.user-logout:hover { background: rgba(255, 255, 255, 0.16); }

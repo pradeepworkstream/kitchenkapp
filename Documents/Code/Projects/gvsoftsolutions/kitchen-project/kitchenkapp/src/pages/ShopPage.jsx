@@ -5,7 +5,7 @@ import api from "../api/api.js";
 import CartSidebar from "../components/CartSidebar.jsx";
 import { useCart } from "../hooks/useCart.js";
 import "./ShopPage.css";
-import { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES } from "../data/vendorCategories.js";
+import { VENDOR_CATEGORIES, ALL_CATEGORIES } from "../data/vendorCategories.js";
 import { sendEvent, assignVariant } from "../utils/analytics.js";
 
 const BACKEND = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
@@ -28,6 +28,7 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
   const [category, setCategory] = useState("");
   const [abVariant] = useState(assignVariant());
   const [cartOpen,  setCartOpen] = useState(false);
+  const [vendorList, setVendorList] = useState([]);
 
   // Vendor conflict modal state
   const [vendorConflict, setVendorConflict] = useState(null);
@@ -39,8 +40,13 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
     if (count === 1 && !cartOpen) setCartOpen(true);
   }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Static vendor/category lists
-  const vendors = VENDORS;
+  // Load vendors from API
+  useEffect(() => {
+    api.get("/api/vendors")
+      .then((res) => setVendorList((res.data?.data || []).map((v) => v.name)))
+      .catch(() => {});
+  }, []);
+
   const categories = vendor ? (VENDOR_CATEGORIES[vendor] || []) : ALL_CATEGORIES;
 
   // Load inventory
@@ -152,7 +158,7 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
             }}
           >
             <option value="">All Vendors</option>
-            {vendors.map((v) => <option key={v} value={v}>{v}</option>)}
+            {vendorList.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
           <select

@@ -5,7 +5,7 @@ import "./InventoryAdmin.css";
 import api from "../api/api.js";
 import lookupsService from "../api/lookupsService.js";
 import Pagination from "./Pagination.jsx";
-import { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES, DEFAULT_UNITS, DEFAULT_QUANTITIES } from "../data/vendorCategories.js";
+import { VENDOR_CATEGORIES, ALL_CATEGORIES, DEFAULT_UNITS, DEFAULT_QUANTITIES } from "../data/vendorCategories.js";
 
 // Prefix relative image paths with the backend base URL
 const BACKEND = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
@@ -79,7 +79,7 @@ export default function InventoryAdmin() {
   const [categoryFilter, setCategoryFilter] = useState("");
 
   // ── Lookup data ──────────────────────────────────────────────────────────
-  const [vendors,    setVendors]    = useState(VENDORS);
+  const [vendors,    setVendors]    = useState([]);
   const [categories, setCategories] = useState([]);
   const [units,      setUnits]      = useState(DEFAULT_UNITS);
   const [quantities, setQuantities] = useState(DEFAULT_QUANTITIES);
@@ -137,6 +137,9 @@ export default function InventoryAdmin() {
   useEffect(() => {
     loadUnits();
     loadQuantities();
+    api.get("/api/vendors")
+      .then((res) => setVendors((res.data?.data || []).map((v) => v.name)))
+      .catch(() => {});
   }, [loadUnits, loadQuantities]);
 
   useEffect(() => {
@@ -179,14 +182,16 @@ export default function InventoryAdmin() {
   // ── Inline add handlers ───────────────────────────────────────────────────
 
   const handleAddVendor = async (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
     setAddingVendor(true);
     try {
-      const res = await lookupsService.createVendor(name);
-      if (!res.success) throw new Error(res.message);
-      setVendors((prev) => [...new Set([...prev, name])]);
-      setForm((prev) => ({ ...prev, vendor: name, category: "" }));
+      const res = await api.post("/api/vendors", { name: trimmed });
+      if (!res.data?.success) throw new Error(res.data?.message);
+      setVendors((prev) => [...new Set([...prev, trimmed])].sort((a, b) => a.localeCompare(b)));
+      setForm((prev) => ({ ...prev, vendor: trimmed, category: "" }));
       setShowNewVendor(false);
-      toast.success(`Vendor "${name}" added`);
+      toast.success(`Vendor "${trimmed}" added`);
     } catch (e) {
       toast.error(e?.response?.data?.message || e.message || "Failed to add vendor");
     } finally {

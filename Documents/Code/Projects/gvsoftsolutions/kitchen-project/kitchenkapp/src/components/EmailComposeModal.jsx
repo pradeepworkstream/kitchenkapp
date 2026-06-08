@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../api/api.js";
+import { saveOrder } from "../utils/orderLog.js";
 import "./EmailComposeModal.css";
 
 function esc(val) {
@@ -259,10 +260,10 @@ export default function EmailComposeModal({ isOpen, onClose, vendor, cartItems =
     if (!vendor) { setToEmail(""); setNoEmail(false); return; }
 
     setLoading(true);
-    api.get("/api/settings/vendors")
+    api.get("/api/vendors")
       .then((res) => {
         const list  = res.data?.data || [];
-        const match = list.find((s) => s.vendor === vendor);
+        const match = list.find((v) => v.name === vendor);
         const email = match?.email || "";
         setToEmail(email);
         setNoEmail(!email);
@@ -287,6 +288,7 @@ export default function EmailComposeModal({ isOpen, onClose, vendor, cartItems =
         message: htmlBody,
       });
       if (!res.data?.success) throw new Error(res.data?.message || "Send failed");
+      saveOrder({ vendor, method: "email", sentTo: to, items: cartItems });
       toast.success("Purchase order sent via email!");
       onClose();
     } catch (e) {

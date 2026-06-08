@@ -1,22 +1,22 @@
 import api from "./api.js";
 
 const vendors = async () => {
-  const res = await api.get("/api/lookups/vendors");
+  const res = await api.get("/api/vendors");
   return res.data;
 };
 
 const createVendor = async (name) => {
-  const res = await api.post("/api/lookups/vendors", { name });
+  const res = await api.post("/api/vendors", { name });
   return res.data;
 };
 
-const updateVendor = async (id, name) => {
-  const res = await api.put(`/api/lookups/vendors/${id}`, { name });
+const updateVendor = async (id, data) => {
+  const res = await api.put(`/api/vendors/${id}`, data);
   return res.data;
 };
 
 const deleteVendor = async (id) => {
-  const res = await api.delete(`/api/lookups/vendors/${id}`);
+  const res = await api.delete(`/api/vendors/${id}`);
   return res.data;
 };
 

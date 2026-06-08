@@ -1,8 +1,6 @@
 // vendorCategories.js
-// Authoritative frontend copy of the master purchase list structure.
-// Vendor names must exactly match the backend (Vendor collection).
-
-export const VENDORS = ["Costco", "Mid East Market", "Spice Bazaar"];
+// Category and unit reference data. Vendor list is now database-driven.
+// See /api/vendors for the live vendor list.
 
 export const VENDOR_CATEGORIES = {
   "Costco": [
@@ -72,4 +70,4 @@ export const DEFAULT_UNITS = [
 
 export const DEFAULT_QUANTITIES = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100];
 
-export default { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES, DEFAULT_UNITS, DEFAULT_QUANTITIES };
+export default { VENDOR_CATEGORIES, ALL_CATEGORIES, DEFAULT_UNITS, DEFAULT_QUANTITIES };

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./Layout.css";
 
-export default function Topbar({ onToggleSidebar, onLogout }) {
+export default function Topbar({ onToggleSidebar, onLogout, pageTitle = "" }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
 
@@ -11,7 +11,6 @@ export default function Topbar({ onToggleSidebar, onLogout }) {
       if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
     };
     const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
-
     document.addEventListener("click", onDocClick);
     document.addEventListener("keydown", onKey);
     return () => {
@@ -31,11 +30,10 @@ export default function Topbar({ onToggleSidebar, onLogout }) {
         >
           ☰
         </button>
+        {pageTitle && <span className="kk-page-title">{pageTitle}</span>}
       </div>
 
       <div className="kk-right">
-        <button className="kk-icon" title="Notifications" aria-label="Notifications">🔔</button>
-
         <div className="kk-profile-root">
           <button
             type="button"
@@ -56,7 +54,7 @@ export default function Topbar({ onToggleSidebar, onLogout }) {
               role="menuitem"
               onClick={() => { setOpen(false); onLogout?.(); }}
             >
-              Logout
+              Sign Out
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useCart } from "../hooks/useCart.js";
 import EmailComposeModal from "./EmailComposeModal.jsx";
+import WhatsAppOrderModal from "./WhatsAppOrderModal.jsx";
 import "./CartSidebar.css";
 
 /**
@@ -18,6 +19,7 @@ export default function CartSidebar({ isAdmin = false, onCheckout, vendorConflic
 
   const [editingId,      setEditingId]      = useState(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [waModalOpen,    setWaModalOpen]    = useState(false);
 
   const totalQty = cart.items ? cart.items.reduce((s, x) => s + (x.qty || 1), 0) : 0;
 
@@ -35,6 +37,14 @@ export default function CartSidebar({ isAdmin = false, onCheckout, vendorConflic
     if (!window.confirm("Clear entire cart?")) return;
     clear();
     toast.success("Cart cleared");
+  };
+
+  const handleWhatsAppClick = () => {
+    if (!cart.items?.length) {
+      toast.error("Please add items before sending a purchase order.");
+      return;
+    }
+    setWaModalOpen(true);
   };
 
   // ── Vendor Conflict Modal ─────────────────────────────────────────────────
@@ -176,7 +186,10 @@ export default function CartSidebar({ isAdmin = false, onCheckout, vendorConflic
           <span className="cs-ready-badge">✓</span>
         </div>
 
-        <button className="cs-checkout-btn" onClick={() => onCheckout?.(cart)}>
+        <button
+          className="cs-checkout-btn"
+          onClick={handleWhatsAppClick}
+        >
           Send Reorder / WhatsApp →
         </button>
 
@@ -194,6 +207,14 @@ export default function CartSidebar({ isAdmin = false, onCheckout, vendorConflic
       <EmailComposeModal
         isOpen={emailModalOpen}
         onClose={() => setEmailModalOpen(false)}
+        vendor={cart.vendor}
+        cartItems={cart.items}
+      />
+
+      {/* WhatsApp Order Modal */}
+      <WhatsAppOrderModal
+        isOpen={waModalOpen}
+        onClose={() => setWaModalOpen(false)}
         vendor={cart.vendor}
         cartItems={cart.items}
       />
