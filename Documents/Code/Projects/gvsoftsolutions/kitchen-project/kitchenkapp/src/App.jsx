@@ -10,6 +10,7 @@ import Users         from "./pages/Users.jsx";
 import Reports       from "./pages/Reports.jsx";
 import ShopPage      from "./pages/ShopPage.jsx";
 import Products      from "./pages/Products.jsx";
+import VendorSettings from "./pages/VendorSettings.jsx";
 import Layout        from "./components/Layout.jsx";
 import "./App.css";
 
@@ -30,6 +31,7 @@ const ADMIN_PAGES = {
   orders:    Orders,
   users:     Users,
   reports:   Reports,
+  settings:  VendorSettings,
 };
 
 const USER_PAGES = {

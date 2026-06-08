@@ -211,6 +211,16 @@
 
 .invTable tbody tr:hover td { background: var(--rowHover); }
 
+.compactSelect {
+  min-width: 88px;
+  max-width: 120px;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
 .tdMuted  { color: var(--muted); font-size: 12px; }
 .tdSmall  { color: #334155; font-size: 12px; }
 .tdStrong { font-weight: 800; color: var(--text); }
@@ -393,6 +403,54 @@
   cursor: pointer;
 }
 
+/* ─── Inline add ─────────────────────────────────────────────────────────────── */
+.inlineAdd {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.inlineAdd input {
+  flex: 1;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.inlineAddBtn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+.inlineAddBtn:hover    { background: var(--primary2); }
+.inlineAddBtn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.inlineCancelBtn {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--muted);
+  transition: background 0.12s;
+}
+.inlineCancelBtn:hover    { background: #f8fafc; }
+.inlineCancelBtn:disabled { opacity: 0.55; cursor: not-allowed; }
+
 /* ─── Pagination (secondary buttons) ────────────────────────────────────────── */
 .secondary {
   background: #fff;
@@ -408,6 +466,178 @@
 
 .secondary:hover    { background: #f8fafc; border-color: rgba(37, 99, 235, 0.25); }
 .secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Image column (table) ───────────────────────────────────────────────────── */
+.invImgCol  { width: 64px; text-align: center; }
+.invImgCell { text-align: center; padding: 6px 8px; }
+
+.tblThumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  display: block;
+  margin: 0 auto;
+}
+.tblThumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
+
+.tblThumbEmpty {
+  width: 44px;
+  height: 44px;
+  background: #f8fafc;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto;
+  color: #94a3b8;
+}
+
+/* ─── Image preview modal ────────────────────────────────────────────────────── */
+.imgPreviewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+
+.imgPreviewModalInner {
+  position: relative;
+  max-width: 560px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.35);
+}
+
+.imgPreviewFull {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  display: block;
+}
+
+.imgPreviewClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(15,23,42,0.65);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+.imgPreviewClose:hover { background: rgba(15,23,42,0.9); }
+
+/* ─── Drawer image upload area ───────────────────────────────────────────────── */
+.imgUploadArea {
+  margin-top: 2px;
+}
+
+.imgUploadBtn {
+  width: 100%;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 20px 16px;
+  background: #f8fafc;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  transition: border-color 0.15s, background 0.15s;
+}
+.imgUploadBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: #eff6ff;
+  color: var(--primary);
+}
+.imgUploadBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.imgUploadIcon { font-size: 26px; }
+
+.imgDrawerPreviewWrap {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.imgDrawerPreview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.imgDrawerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  flex: 1;
+}
+
+.imgReplaceBtn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s;
+  text-align: left;
+}
+.imgReplaceBtn:hover:not(:disabled) { background: var(--primary2); }
+.imgReplaceBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.imgRemoveBtn {
+  background: #fff;
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,.35);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s;
+  text-align: left;
+}
+.imgRemoveBtn:hover:not(:disabled) { background: #fff5f5; }
+.imgRemoveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ─── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {

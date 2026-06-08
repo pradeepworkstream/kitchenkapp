@@ -8,6 +8,7 @@ const ADMIN_ITEMS = [
   { key: "orders",    label: "Orders",     icon: "📋" },
   { key: "users",     label: "Users",      icon: "👥" },
   { key: "reports",   label: "Reports",    icon: "📊" },
+  { key: "settings",  label: "Settings",   icon: "⚙️" },
 ];
 
 export default function Sidebar({ active, onNavigate, collapsed }) {

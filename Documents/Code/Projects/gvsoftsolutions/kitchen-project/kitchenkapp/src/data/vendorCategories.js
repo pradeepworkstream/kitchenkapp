@@ -1,63 +1,75 @@
 // vendorCategories.js
-// Master category lists per vendor (used by frontend filters and admin UI)
-export const VENDORS = ["Costco", "Mid East", "Spice Bazaar"];
+// Authoritative frontend copy of the master purchase list structure.
+// Vendor names must exactly match the backend (Vendor collection).
+
+export const VENDORS = ["Costco", "Mid East Market", "Spice Bazaar"];
 
 export const VENDOR_CATEGORIES = {
-  Costco: [
-    "Beverages",
-    "Bread & Frozen",
+  "Costco": [
     "Chicken",
-    "Citrus",
-    "Cleaning Supplies",
-    "Dairy & Refrigerated",
-    "Disposable Restaurant Supplies",
-    "Herbs",
-    "Nuts & Dry Fruits",
-    "Oils & Cooking Ingredients",
-    "Protein",
-    "Rice, Flour & Baking",
     "Seafood",
-    "Vegetables & Produce",
-  ],
-  "Mid East": [
+    "Other Protein",
+    "Dairy & Refrigerated",
+    "Vegetables",
+    "Herbs",
+    "Citrus",
+    "Rice, Flour & Baking",
+    "Oils & Cooking Ingredients",
+    "Nuts & Dry Fruits",
     "Beverages",
     "Bread & Frozen",
-    "Chicken",
-    "Coconut Products",
-    "Dals, Beans & Pulses",
-    "Fresh Vegetables & Herbs",
-    "Frozen Items",
+    "Cleaning Supplies",
+    "Plates & Trays",
+    "Cups & Containers",
+    "Cutlery & Paper Goods",
+    "Storage",
+    "Kitchen Supplies",
+    "Produce",
+    "Protein",
+    "Staples",
+    "Restaurant Supplies",
+  ],
+  "Mid East Market": [
+    "Chicken (Skinless)",
     "Goat",
-    "Miscellaneous",
-    "Nuts & Dry Fruits",
+    "Fresh Vegetables & Herbs",
     "Rice, Flour & Grains",
-    "Sauces, Pastes & Condiments",
+    "Dals, Beans & Pulses",
+    "Spices & Whole Masalas",
     "Spice Powders",
-    "Whole Spices",
+    "Sauces, Pastes & Condiments",
+    "Coconut Products",
+    "Frozen Items",
+    "Bakery & Ready-to-Eat",
+    "Beverages",
+    "Dry Fruits & Miscellaneous",
+    "Frequently Ordered in Full Cases",
   ],
   "Spice Bazaar": [
-    "Bakery, Snacks & Ready-to-Eat",
-    "Beverages",
-    "Bread & Frozen",
-    "Dairy & Refrigerated",
-    "Dals & Pulses",
     "Fresh Vegetables & Greens",
     "Frozen Vegetables & Produce",
-    "Miscellaneous",
-    "Nuts & Dry Fruits",
-    "Rice, Flour & Baking",
-    "Sauces, Pastes & Chutneys",
-    "Spice Powders & Masalas",
+    "Rice, Flours & Grains",
+    "Dals & Pulses",
+    "Nuts & Seeds",
     "Whole Spices",
+    "Spice Powders & Masalas",
+    "Sauces, Pastes & Chutneys",
+    "Bakery, Snacks & Ready-to-Eat",
+    "Dairy & Dessert Ingredients",
+    "Beverages",
+    "Miscellaneous",
   ],
 };
 
 export const ALL_CATEGORIES = Array.from(
-  new Set([
-    ...VENDOR_CATEGORIES.Costco,
-    ...VENDOR_CATEGORIES["Mid East"],
-    ...VENDOR_CATEGORIES["Spice Bazaar"],
-  ])
+  new Set(Object.values(VENDOR_CATEGORIES).flat())
 ).sort((a, b) => a.localeCompare(b));
 
-export default { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES };
+export const DEFAULT_UNITS = [
+  "Bag", "Bottle", "Box", "Carton", "Case",
+  "Kg", "Lb", "Pack", "Piece", "Tray",
+];
+
+export const DEFAULT_QUANTITIES = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100];
+
+export default { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES, DEFAULT_UNITS, DEFAULT_QUANTITIES };

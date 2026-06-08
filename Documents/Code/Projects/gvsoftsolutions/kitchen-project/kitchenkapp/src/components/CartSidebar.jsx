@@ -2,20 +2,24 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useCart } from "../hooks/useCart.js";
+import EmailComposeModal from "./EmailComposeModal.jsx";
 import "./CartSidebar.css";
 
 /**
  * Props:
- *   isAdmin  {boolean}  — shows Edit button only for admins
- *   onCheckout {fn}     — called when "Send Order" is clicked
+ *   isAdmin          {boolean}  — shows Edit button only for admins
+ *   onCheckout       {fn}       — called when "Send Order" is clicked
+ *   vendorConflict   {object|null}  — { cartVendor, newVendor, confirmAdd, cancel }
+ *                                    passed down from parent when a vendor conflict
+ *                                    is detected on add-to-cart
  */
-export default function CartSidebar({ isAdmin = false, onCheckout }) {
+export default function CartSidebar({ isAdmin = false, onCheckout, vendorConflict = null }) {
   const { cart, count, update, remove, clear } = useCart();
 
-  // Which item's edit panel is open (admin only)
-  const [editingId, setEditingId] = useState(null);
+  const [editingId,      setEditingId]      = useState(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
 
-  const totalQty = cart.reduce((s, x) => s + (x.qty || 1), 0);
+  const totalQty = cart.items ? cart.items.reduce((s, x) => s + (x.qty || 1), 0) : 0;
 
   const changeQty = (item, delta) => {
     const next = (item.qty || 1) + delta;
@@ -33,7 +37,35 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
     toast.success("Cart cleared");
   };
 
-  if (cart.length === 0) {
+  // ── Vendor Conflict Modal ─────────────────────────────────────────────────
+  if (vendorConflict) {
+    return (
+      <div className="cs-wrap">
+        <div className="cs-conflict-overlay">
+          <div className="cs-conflict-modal">
+            <div className="cs-conflict-title">Vendor Change Detected</div>
+            <p className="cs-conflict-msg">
+              Your cart currently contains items from{" "}
+              <strong>"{vendorConflict.cartVendor}"</strong>.
+              <br />
+              To order from <strong>"{vendorConflict.newVendor}"</strong>, the current cart must be cleared.
+            </p>
+            <p className="cs-conflict-question">Do you want to clear the cart and continue?</p>
+            <div className="cs-conflict-btns">
+              <button className="cs-conflict-cancel" onClick={vendorConflict.cancel}>
+                Cancel
+              </button>
+              <button className="cs-conflict-confirm" onClick={vendorConflict.confirmAdd}>
+                Clear Cart &amp; Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cart.items || cart.items.length === 0) {
     return (
       <div className="cs-wrap">
         <div className="cs-header">
@@ -62,21 +94,25 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
         </button>
       </div>
 
+      {/* Vendor badge */}
+      {cart.vendor && (
+        <div className="cs-vendor-badge">
+          <span className="cs-vendor-label">Vendor:</span>
+          <span className="cs-vendor-name">{cart.vendor}</span>
+        </div>
+      )}
+
       {/* Items */}
       <div className="cs-items">
-        {cart.map((item) => (
+        {cart.items.map((item) => (
           <div key={item._id} className="cs-item">
             <div className="cs-item-icon">{getCategoryEmoji(item.category)}</div>
 
             <div className="cs-item-body">
               <div className="cs-item-name">{item.name}</div>
               <div className="cs-item-cat">{item.category}</div>
-              {item.vendorOrder && (
-                <div className="cs-item-badge">Vendor order</div>
-              )}
 
-              {/* Qty controls — available to everyone */}
-                <div className="cs-item-controls">
+              <div className="cs-item-controls">
                 <div className="cs-qty">
                   <button
                     className="cs-qty-btn"
@@ -91,7 +127,6 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
                   >+</button>
                 </div>
 
-                {/* Edit button — admin only */}
                 {isAdmin && (
                   <button
                     className="cs-edit-btn"
@@ -108,22 +143,9 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
                 >×</button>
               </div>
 
-              {/* Admin edit panel */}
               {isAdmin && editingId === item._id && (
                 <div className="cs-edit-panel">
-                  <label className="cs-edit-label">Brand</label>
-                  <select
-                    className="cs-edit-select"
-                    value={item.selectedBrand || ""}
-                    onChange={(e) => update(item._id, { selectedBrand: e.target.value })}
-                  >
-                    <option value="">Any</option>
-                    {(item.brandOptions || []).map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
-
-                  <label className="cs-edit-label" style={{ marginTop: 8 }}>Qty</label>
+                  <label className="cs-edit-label">Qty</label>
                   <input
                     className="cs-edit-input"
                     type="number"
@@ -144,7 +166,7 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
       {/* Footer summary */}
       <div className="cs-footer">
         <div className="cs-summary-row">
-          <span>Items</span><span>{cart.length}</span>
+          <span>Items</span><span>{cart.items.length}</span>
         </div>
         <div className="cs-summary-row">
           <span>Total qty</span><span>{totalQty}</span>
@@ -161,12 +183,20 @@ export default function CartSidebar({ isAdmin = false, onCheckout }) {
         {isAdmin && (
           <button
             className="cs-checkout-btn cs-email-btn"
-            onClick={() => onCheckout?.(cart, "email")}
+            onClick={() => setEmailModalOpen(true)}
           >
             Send via Email →
           </button>
         )}
       </div>
+
+      {/* Email Compose Modal */}
+      <EmailComposeModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        vendor={cart.vendor}
+        cartItems={cart.items}
+      />
     </div>
   );
 }

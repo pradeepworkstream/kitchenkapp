@@ -1,0 +1,175 @@
+/* src/pages/VendorSettings.css */
+
+.vs-page {
+  padding: 24px;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.vs-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 760px;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.vs-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.vs-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.vs-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Loading ────────────────────────────────────────────────────────────── */
+.vs-loading {
+  padding: 40px 28px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ─── Vendor rows ────────────────────────────────────────────────────────── */
+.vs-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.vs-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.vs-row:last-child { border-bottom: none; }
+
+.vs-row-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 240px;
+}
+
+.vs-icon {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vs-vendor-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.vs-vendor-hint {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.vs-row-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vs-input {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.vs-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.vs-input::placeholder { color: #94a3b8; }
+
+.vs-save-btn {
+  background: #0b1220;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+  min-width: 76px;
+}
+.vs-save-btn:hover { background: #1f2937; }
+.vs-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ─── Info footer ────────────────────────────────────────────────────────── */
+.vs-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 28px 24px;
+  padding: 13px 16px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+}
+
+.vs-info-icon {
+  font-size: 15px;
+  color: #0284c7;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vs-info p {
+  font-size: 12.5px;
+  color: #0c4a6e;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.vs-info code {
+  background: #e0f2fe;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11.5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .vs-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .vs-row-left { flex: unset; }
+  .vs-row-right { width: 100%; }
+}

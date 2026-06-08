@@ -8,9 +8,16 @@ import "./ShopPage.css";
 import { VENDORS, VENDOR_CATEGORIES, ALL_CATEGORIES } from "../data/vendorCategories.js";
 import { sendEvent, assignVariant } from "../utils/analytics.js";
 
+const BACKEND = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
+function getImageUrl(imageUrl) {
+  if (!imageUrl) return null;
+  if (imageUrl.startsWith("http")) return imageUrl;
+  return `${BACKEND}${imageUrl}`;
+}
+
 /**
  * Props:
- *   isAdmin {boolean}
+ *   isAdmin  {boolean}
  *   onReorder {fn(cart, method)} — called when user clicks Send Order
  */
 export default function ShopPage({ isAdmin = false, onReorder }) {
@@ -20,48 +27,59 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
   const [vendor,   setVendor]   = useState("");
   const [category, setCategory] = useState("");
   const [abVariant] = useState(assignVariant());
-  const [cartOpen, setCartOpen] = useState(false);
+  const [cartOpen,  setCartOpen] = useState(false);
 
-  const { add, isInCart, count } = useCart();
+  // Vendor conflict modal state
+  const [vendorConflict, setVendorConflict] = useState(null);
+
+  const { addWithConflictCheck, isInCart, count } = useCart();
 
   // Auto-open cart drawer when first item added
   useEffect(() => {
     if (count === 1 && !cartOpen) setCartOpen(true);
   }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Static vendor/category lists
+  const vendors = VENDORS;
+  const categories = vendor ? (VENDOR_CATEGORIES[vendor] || []) : ALL_CATEGORIES;
+
+  // Load inventory
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get("/api/inventory/list", {
-        params: { limit: 200, search, vendor, category },
-      });
+      const params = { limit: 200, search, vendor, category };
+      console.log("[Shop] fetch →", params);
+      const res = await api.get("/api/inventory/list", { params });
       if (!res.data?.success) throw new Error(res.data?.message || "Failed");
-      setItems(res.data.data || []);
+      const data = res.data.data || [];
+      console.log("[Shop] API response — total:", res.data.total, "returned:", data.length);
+      if (data.length > 0) {
+        console.log("[Shop] sample item:", JSON.stringify(data[0], null, 2));
+      }
+      setItems(data);
     } catch (e) {
+      console.error("[Shop] load error:", e?.response?.data || e.message);
       toast.error(e?.response?.data?.message || e.message || "Failed to load");
     } finally {
       setLoading(false);
     }
   }, [search, vendor, category]);
 
-
   useEffect(() => {
     const t = setTimeout(load, 300);
     return () => clearTimeout(t);
   }, [load]);
 
-  // report page view with variant
   useEffect(() => {
-    sendEvent('page_view', { page: 'shop', variant: abVariant });
+    sendEvent("page_view", { page: "shop", variant: abVariant });
   }, [abVariant]);
 
-  // Listen for inventory changes (admin creates/updates/deletes)
+  // Refresh when admin changes inventory
   useEffect(() => {
     const onChange = () => load();
     window.addEventListener("inventory:changed", onChange);
     return () => window.removeEventListener("inventory:changed", onChange);
   }, [load]);
-
 
   // Group items by category
   const grouped = items.reduce((acc, item) => {
@@ -71,26 +89,39 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
     return acc;
   }, {});
 
-  // Vendor dropdown must be exactly this list and in this order
-  const vendors = VENDORS;
-
-  // Category list depends on selected vendor
-  const categories = vendor ? (VENDOR_CATEGORIES[vendor] || []) : ALL_CATEGORIES;
-
   const handleAddToCart = (item) => {
     if (!item?._id && !item?.id) {
       toast.error("Unable to add vendor order: missing product id");
       return;
     }
 
-    add(item);
-    toast.success(`${item.name} added to vendor order`, { autoClose: 1500 });
-    sendEvent('add_to_cart', { variant: abVariant, vendor: item.vendor || vendor, category: item.category, itemId: item._id });
+    let hadConflict = false;
+
+    addWithConflictCheck(item, ({ cartVendor, newVendor, confirmAdd }) => {
+      hadConflict = true;
+      setVendorConflict({
+        cartVendor,
+        newVendor,
+        confirmAdd: () => {
+          confirmAdd();
+          setVendorConflict(null);
+          toast.success(`${item.name} added to vendor order`, { autoClose: 1500 });
+          sendEvent("add_to_cart", { variant: abVariant, vendor: item.vendor, category: item.category, itemId: item._id });
+        },
+        cancel: () => setVendorConflict(null),
+      });
+      setCartOpen(true);
+    });
+
+    if (!hadConflict) {
+      toast.success(`${item.name} added to vendor order`, { autoClose: 1500 });
+      sendEvent("add_to_cart", { variant: abVariant, vendor: item.vendor || vendor, category: item.category, itemId: item._id });
+    }
   };
 
   const handleCheckout = (cartItems, method = "whatsapp") => {
     onReorder?.(cartItems, method);
-    sendEvent('checkout', { variant: abVariant, method, count: cartItems.length });
+    sendEvent("checkout", { variant: abVariant, method, count: cartItems.length });
   };
 
   return (
@@ -121,25 +152,21 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
             }}
           >
             <option value="">All Vendors</option>
-            {vendors.map((v) => (
-              <option key={v} value={v}>{v}</option>
-            ))}
+            {vendors.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
           <select
             className="shop-cat-select"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            disabled={abVariant === 'vendor-first' && !vendor}
+            disabled={abVariant === "vendor-first" && !vendor}
           >
-            {abVariant === 'vendor-first' && !vendor ? (
+            {abVariant === "vendor-first" && !vendor ? (
               <option value="">Select vendor first</option>
             ) : (
               <>
                 <option value="">All Categories</option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </>
             )}
           </select>
@@ -172,7 +199,6 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
                 <div className="shop-grid">
                   {catItems.map((item) => {
                     const itemId = item._id || item.id || item.productId;
-                    const itemStock = Number(item.stock ?? 0);
                     const inCart = isInCart(itemId);
 
                     return (
@@ -180,30 +206,31 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
                         key={itemId || item.name}
                         className={`shop-card ${inCart ? "shop-card--in-cart" : ""}`}
                       >
-                        <div className="shop-card-icon">{getCategoryEmoji(item.category)}</div>
+                        <div className="shop-card-icon">
+                          {getImageUrl(item.imageUrl) ? (
+                            <img
+                              src={getImageUrl(item.imageUrl)}
+                              alt={item.name}
+                              className="shop-card-img"
+                              onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }}
+                            />
+                          ) : null}
+                          <span
+                            className="shop-card-emoji"
+                            style={{ display: getImageUrl(item.imageUrl) ? "none" : "flex" }}
+                          >
+                            {getCategoryEmoji(item.category)}
+                          </span>
+                        </div>
 
                         <div className="shop-card-body">
                           <div className="shop-card-name">{item.name}</div>
-
-                          {(item.brandOptions || []).length > 0 && (
-                            <div className="shop-card-brands">
-                              {item.brandOptions.slice(0, 3).map((b) => (
-                                <span key={b} className="shop-brand-tag">{b}</span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="shop-card-meta">
-                            <span className={`shop-stock ${itemStock <= 5 ? "shop-stock--low" : ""}`}>
-                              {`Stock: ${itemStock}`}
-                            </span>
-                          </div>
                         </div>
 
                         <button
                           className={`shop-add-btn ${inCart ? "shop-add-btn--added" : ""}`}
                           disabled={!itemId || inCart}
-                          onClick={() => !inCart && handleAddToCart({ ...item, _id: itemId, vendorOrder: true })}
+                          onClick={() => !inCart && handleAddToCart({ ...item, _id: itemId })}
                         >
                           {inCart ? "✓ Added" : "Order from vendor"}
                         </button>
@@ -222,12 +249,13 @@ export default function ShopPage({ isAdmin = false, onReorder }) {
         <CartSidebar
           isAdmin={isAdmin}
           onCheckout={handleCheckout}
+          vendorConflict={vendorConflict}
         />
       </div>
 
       {/* Mobile overlay */}
       {cartOpen && (
-        <div className="shop-overlay" onClick={() => setCartOpen(false)} />
+        <div className="shop-overlay" onClick={() => { setCartOpen(false); setVendorConflict(null); }} />
       )}
     </div>
   );

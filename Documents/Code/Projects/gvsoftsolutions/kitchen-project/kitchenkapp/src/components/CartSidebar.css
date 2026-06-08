@@ -307,3 +307,100 @@
   margin-bottom: 0;
 }
 .cs-email-btn:hover { background: #f8fafc; }
+
+/* ─── Vendor badge ───────────────────────────────────────────────────────────── */
+.cs-vendor-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: #eff6ff;
+  border-bottom: 1px solid #bfdbfe;
+  flex-shrink: 0;
+}
+
+.cs-vendor-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3b82f6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cs-vendor-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+/* ─── Vendor conflict modal ──────────────────────────────────────────────────── */
+.cs-conflict-overlay {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.cs-conflict-modal {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+  width: 100%;
+}
+
+.cs-conflict-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.cs-conflict-msg {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.cs-conflict-question {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 18px;
+}
+
+.cs-conflict-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cs-conflict-cancel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #334155;
+  transition: background .12s;
+}
+.cs-conflict-cancel:hover { background: #f8fafc; }
+
+.cs-conflict-confirm {
+  background: #ef4444;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  transition: background .12s;
+}
+.cs-conflict-confirm:hover { background: #dc2626; }
